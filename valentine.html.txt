@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>💌 Valentine Question</title>
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+  }
+
+  h1 {
+    color: white;
+    font-size: 2.6rem;
+    margin-bottom: 25px;
+    text-shadow: 0 5px 15px rgba(0,0,0,0.25);
+  }
+
+  .buttons {
+    position: relative;
+  }
+
+  button {
+    padding: 14px 34px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    margin: 10px;
+    transition: 0.15s;
+  }
+
+  #yesBtn {
+    background-color: #fff;
+    color: #ff2d55;
+    font-weight: bold;
+  }
+
+  #noBtn {
+    background-color: #ff2d55;
+    color: white;
+    position: absolute;
+  }
+
+  .msg {
+    color: white;
+    margin-top: 15px;
+    font-size: 1.2rem;
+  }
+
+  .heart {
+    position: absolute;
+    font-size: 22px;
+    animation: float 3s linear infinite;
+  }
+
+  @keyframes float {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-200px); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<h1>💌 Will you be my Valentine ? 💌</h1>
+
+<div class="buttons">
+  <button id="yesBtn">Yes 💖</button>
+  <button id="noBtn">No 😢</button>
+</div>
+
+<div class="msg" id="msg"></div>
+
+<script>
+const noBtn = document.getElementById("noBtn");
+const yesBtn = document.getElementById("yesBtn");
+const msg = document.getElementById("msg");
+
+let attempts = 0;
+
+// impossible de cliquer sur NO 😈
+function moveNoButton() {
+  const x = Math.random() * (window.innerWidth - 120);
+  const y = Math.random() * (window.innerHeight - 120);
+  noBtn.style.left = x + "px";
+  noBtn.style.top = y + "px";
+}
+
+noBtn.addEventListener("mouseover", moveNoButton);
+noBtn.addEventListener("mousedown", moveNoButton);
+noBtn.addEventListener("click", moveNoButton);
+
+// messages quand elle insiste 😂
+noBtn.addEventListener("mouseover", () => {
+  attempts++;
+  const texts = [
+    "😏 Nope!",
+    "😂 Try again!",
+    "🥺 Come on...",
+    "😈 Wrong choice!",
+    "💘 You know the answer...",
+    "😎 Impossible!"
+  ];
+  msg.innerText = texts[attempts % texts.length];
+});
+
+// quand elle clique sur YES 💕
+yesBtn.addEventListener("click", () => {
+  document.body.innerHTML = "<h1>😍 Yesss! You just made my day 💕💘</h1>";
+
+  setInterval(() => {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.innerHTML = "💖";
+    heart.style.left = Math.random() * window.innerWidth + "px";
+    heart.style.top = window.innerHeight + "px";
+    document.body.appendChild(heart);
+
+    setTimeout(() => heart.remove(), 3000);
+  }, 150);
+});
+</script>
+
+</body>
+</html>
