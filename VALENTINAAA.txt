@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>💌 Valentine</title>
+<style>
+  body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    overflow:hidden;
+    text-align:center;
+  }
+  h1{
+    color:#fff;
+    font-size:2.3rem;
+    text-shadow:0 6px 18px rgba(0,0,0,.25);
+    margin: 0 0 18px 0;
+    padding: 0 14px;
+  }
+  p{
+    color:#fff;
+    margin: 0 0 18px 0;
+    opacity:.95;
+  }
+  .wrap{
+    position:relative;
+    width:min(520px, 92vw);
+    height:170px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+  }
+  button{
+    padding:14px 28px;
+    font-size:1.05rem;
+    border:0;
+    border-radius:999px;
+    cursor:pointer;
+    box-shadow: 0 10px 24px rgba(0,0,0,.18);
+    transition: transform .12s ease;
+    user-select:none;
+  }
+  button:active{ transform: scale(.98); }
+
+  #yesBtn{
+    background:#fff;
+    color:#ff2d55;
+    font-weight:800;
+  }
+  #noBtn{
+    background:#ff2d55;
+    color:#fff;
+    font-weight:700;
+    position:absolute;
+    left: 60%;
+    top: 64%;
+    transform: translate(-50%, -50%);
+  }
+
+  #msg{
+    color:#fff;
+    font-size:1.05rem;
+    min-height:1.4em;
+    padding: 0 14px;
+  }
+
+  .heart{
+    position:absolute;
+    font-size:22px;
+    animation: floatUp 3s linear forwards;
+    pointer-events:none;
+  }
+  @keyframes floatUp{
+    from{ transform: translateY(0); opacity:1; }
+    to{ transform: translateY(-240px); opacity:0; }
+  }
+
+  .card{
+    width:min(720px, 92vw);
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 22px;
+    padding: 22px 16px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 18px 40px rgba(0,0,0,.18);
+  }
+</style>
+</head>
+<body>
+
+<div class="card" id="card">
+  <h1>💌 Will you be my Valentine ? 💌</h1>
+  <p>(ps: the “No” button is a little… shy 😈)</p>
+
+  <div class="wrap">
+    <button id="yesBtn">Yes 💖</button>
+    <button id="noBtn">No 😢</button>
+  </div>
+
+  <div id="msg"></div>
+</div>
+
+<!-- 🎵 Musique (démarre au clic) -->
+<audio id="bgm" loop preload="auto">
+  <!-- Mets ton fichier mp3 dans le repo et renomme le en "love.mp3" -->
+  <source src="love.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn  = document.getElementById("noBtn");
+  const msg    = document.getElementById("msg");
+  const bgm    = document.getElementById("bgm");
+  const card   = document.getElementById("card");
+
+  let tries = 0;
+  let musicStarted = false;
+
+  function startMusic(){
+    if(musicStarted) return;
+    musicStarted = true;
+    // Certains navigateurs bloquent si pas de clic utilisateur -> ici on appelle au clic
+    bgm.play().catch(() => {
+      msg.textContent = "🎵 (Clique encore une fois pour lancer la musique 😉)";
+      musicStarted = false;
+    });
+  }
+
+  function heartsRain() {
+    setInterval(() => {
+      const h = document.createElement("div");
+      h.className = "heart";
+      h.textContent = ["💖","💘","💕","💗"][Math.floor(Math.random()*4)];
+      h.style.left = (Math.random() * window.innerWidth) + "px";
+      h.style.top  = (window.innerHeight - 10) + "px";
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 3000);
+    }, 160);
+  }
+
+  function moveNo(){
+    const pad = 20;
+    const x = Math.random() * (window.innerWidth - 140 - pad) + pad;
+    const y = Math.random() * (window.innerHeight - 140 - pad) + pad;
+    noBtn.style.left = x + "px";
+    noBtn.style.top  = y + "px";
+  }
+
+  // 😈 NO fuit + messages + finit par devenir YES
+  function handleNoAttempt(){
+    startMusic();
+    tries++;
+
+    const texts = [
+      "😏 Non ? tu es sûre ?",
+      "😂 Oups… raté.",
+      "🥺 Allez stp…",
+      "😈 Mauvais bouton.",
+      "💘 Je pense que tu voulais dire OUI.",
+      "🤭 Dernière chance…"
+    ];
+    msg.textContent = texts[tries % texts.length];
+
+    // Il fuit au début
+    if(tries < 5){
+      moveNo();
+      return;
+    }
+
+    // Après 5 tentatives, il devient YES ✅
+    noBtn.textContent = "Yes 💖";
+    noBtn.style.background = "#fff";
+    noBtn.style.color = "#ff2d55";
+    noBtn.style.fontWeight = "800";
+
+    // Et quand on clique dessus -> c’est comme YES
+    noBtn.onclick = () => yesBtn.click();
+    msg.textContent = "😌 Voilààà… c’est mieux comme ça.";
+  }
+
+  noBtn.addEventListener("mouseenter", handleNoAttempt);
+  noBtn.addEventListener("mousedown", handleNoAttempt);
+  noBtn.addEventListener("touchstart", handleNoAttempt, {passive:true});
+
+  // ✅ YES = final
+  yesBtn.addEventListener("click", () => {
+    startMusic();
+    card.innerHTML = `
+      <h1>😍 Yesss!! 💕💘</h1>
+      <p style="font-size:1.15rem;margin-top:10px;">
+        Now you’re officially mine 😌💘
+      </p>
+      <p style="opacity:.9;margin-top:10px;">
+        (ok ok… juste pour la Saint-Valentin 😇)
+      </p>
+    `;
+    heartsRain();
+  });
+
+  // Bonus: démarrer musique au premier clic n’importe où (facilite sur mobile)
+  document.addEventListener("click", startMusic, { once:true });
+</script>
+
+</body>
+</html>
